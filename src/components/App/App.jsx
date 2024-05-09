@@ -1,35 +1,67 @@
-import './App.css'
-import ContactForm from "../ContactForm/ContactForm.jsx";
-import SearchBox from "../SearchBox/SearchBox.jsx";
-import ContactList from "../ContactList/ContactList.jsx";
-// import Loader from "../Loader/Loader.jsx";
-import {useDispatch, useSelector} from "react-redux";
-import {useEffect} from "react";
-import {fetchContacts} from "../../redux/contactsOps.js";
-import {selectContacts, selectError, selectLoading} from "../../redux/selecters.js";
-import Error from "../Error/Error.jsx";
-import Loader from "../Loader/Loader.jsx";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { lazy, useEffect } from "react";
+import "./App.css";
+import { Route, Routes } from "react-router-dom";
+import Layout from "../Layout/Layout";
+import "../../redux/contacts/selectors.js";
+import { RestrictedRoute } from "../../RestrictedRoute.jsx";
+import { PrivateRoute } from "../../PrivateRoute.jsx";
+import { refreshUser } from "../../redux/auth/operations.js";
+import { selectIsRefreshing } from "../../redux/auth/selectors.js";
 
+const HomePage = lazy(() => import("../../pages/HomePage/HomePage.jsx"));
+const RegisterPage = lazy(() =>
+  import("../../pages/RegistrationPage/RegistrationPage.jsx")
+);
+const LoginPage = lazy(() => import("../../pages/LoginPage/LoginPage.jsx"));
+const ContactsPage = lazy(() =>
+  import("../../pages/ContactsPage/ContactsPage")
+);
 
 function App() {
-    const dispatch = useDispatch();
-    const contacts = useSelector(selectContacts);
-    const isLoading = useSelector(selectLoading);
-    const error = useSelector(selectError);
+  const dispatch = useDispatch();
+  const isRefreshing = useSelector(selectIsRefreshing);
 
-    useEffect(() => {
-        dispatch(fetchContacts())
-    }, [dispatch]);
-    return (
-        <>
-            <h1>Phonebook</h1>
-            <ContactForm/>
-            <SearchBox  />
-            {error && <Error />}
-            {isLoading && <Loader />}
-            {contacts.length === 0 ? "Create a contact" : <ContactList /> }
-        </>
-    );
+  useEffect(() => {
+    dispatch(refreshUser());
+  }, [dispatch]);
+
+  return isRefreshing ? (
+    <p>Refreshing user...</p>
+  ) : (
+    <>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/register"
+            element={
+              <RestrictedRoute
+                redirectTo="/contacts"
+                component={<RegisterPage />}
+              />
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <RestrictedRoute
+                redirectTo="/contacts"
+                component={<LoginPage />}
+              />
+            }
+          />
+          <Route
+            path="/contacts"
+            element={
+              <PrivateRoute redirectTo="/login" component={<ContactsPage />} />
+            }
+          />
+        </Routes>
+      </Layout>
+    </>
+  );
 }
 
 export default App;

@@ -1,14 +1,26 @@
-.form{
-    /*display: flex;*/
-    /*align-items: center;*/
-    /*flex-direction: column;*/
-    /*gap: 30px;*/
+.form {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
 }
-.input{
-    display: flex;
-    flex-direction: column;
-    width: 200px;
+
+.btn {
+  font-size: 14px;
+  border: 1px solid black;
+  padding: 6px;
 }
-.inputText{
-    border-radius: 8px;
+
+.btn:hover {
+  background-color: black;
+  color: rgb(229, 226, 226);
+  outline: none;
+  border-color: transparent;
+}
+
+.input {
+  font-size: 14px;
+  border: 1px solid black;
+  padding: 6px;
+  border-radius: 8px;
 }
